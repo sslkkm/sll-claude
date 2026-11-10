@@ -1,0 +1,225 @@
+<title>뉴스레터 브리핑</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* 레이아웃: 한 줄 요약 → 섹션별 '겹친 곳 수' 순위 카드 → 2곳 목록 → 업무 참고 밴드 → 메일함 메모 */
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --ink: #142030;
+  --muted: #5b6878;
+  --line: #dde3ea;
+  --accent: #2450d6;
+  --accent-soft: #e7edfc;
+  --dot-off: #cfd6df;
+  --work: #0f7b6c;
+  --work-soft: #e3f3f0;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151d; --surface: #17202b; --ink: #e6ebf1; --muted: #9aa7b6; --line: #273342;
+    --accent: #7f9ef5; --accent-soft: #1d2a48; --dot-off: #33404f; --work: #4cc3ad; --work-soft: #12302b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151d; --surface: #17202b; --ink: #e6ebf1; --muted: #9aa7b6; --line: #273342;
+  --accent: #7f9ef5; --accent-soft: #1d2a48; --dot-off: #33404f; --work: #4cc3ad; --work-soft: #12302b;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+.wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 36px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+.mast { display: grid; gap: 10px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; color: var(--muted); font-weight: 500; }
+.mast h1 { font-size: clamp(26px, 5vw, 36px); font-weight: 700; letter-spacing: -.01em; }
+.mast h1 .date { font-family: var(--font-num); font-weight: 600; color: var(--accent); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.meta span { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 13px; color: var(--muted); }
+.meta b { color: var(--ink); font-family: var(--font-num); font-weight: 600; }
+.method { font-size: 13px; color: var(--muted); max-width: 68ch; }
+
+.tldr { background: var(--accent); color: #fff; border-radius: 14px; padding: 20px 22px; display: grid; gap: 10px; }
+.tldr h2 { font-size: 13px; letter-spacing: .08em; font-weight: 500; opacity: .85; }
+.tldr ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; font-size: 16px; font-weight: 500; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tldr { color: #0f151d; } }
+:root[data-theme="dark"] .tldr { color: #0f151d; }
+
+section.block { display: grid; gap: 14px; }
+.block-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+.block-head h2 { font-size: 20px; font-weight: 700; }
+.block-head .sub { font-size: 13px; color: var(--muted); }
+
+.issues { display: grid; gap: 12px; }
+.issue { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; }
+.rank { grid-row: span 3; font-family: var(--font-num); font-weight: 600; font-size: 28px; line-height: 1; color: var(--accent); min-width: 1.4em; }
+.issue h3 { font-size: 17px; font-weight: 700; min-width: 0; }
+.cover { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
+.dots { display: inline-flex; gap: 4px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--dot-off); display: block; }
+.dots i.on { background: var(--accent); }
+.count { font-family: var(--font-num); font-weight: 600; font-size: 13px; color: var(--accent); }
+.chip { font-size: 12px; padding: 1px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); white-space: nowrap; }
+.issue p { margin: 6px 0 0; color: var(--ink); min-width: 0; max-width: 68ch; }
+
+.pairs { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 20px; }
+.pairs h3 { font-size: 13px; letter-spacing: .06em; color: var(--muted); font-weight: 500; padding-top: 12px; }
+.pairs ul { list-style: none; margin: 0; padding: 0; }
+.pairs li { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.pairs li:first-child { border-top: 0; }
+.pairs li .t { flex: 1 1 320px; min-width: 0; }
+.pairs li .srcs { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.work { background: var(--work-soft); border-radius: 14px; padding: 18px 20px; display: grid; gap: 12px; }
+.work .block-head { border-color: var(--work); }
+.work .block-head h2 { color: var(--work); }
+.work-item { display: grid; gap: 2px; }
+.work-item h3 { font-size: 16px; font-weight: 700; }
+.work-item .src { font-size: 12px; color: var(--muted); }
+.work-item p { margin: 0; max-width: 68ch; }
+
+.status { font-size: 13px; color: var(--muted); display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 14px; }
+.status ul { margin: 0; padding-left: 1.2em; }
+@media (max-width: 480px) {
+  .issue { grid-template-columns: 1fr; }
+  .rank { grid-row: auto; font-size: 22px; }
+}
+</style>
+
+<div class="wrap" id="app">
+  <header class="mast">
+    <div class="eyebrow">받은 편지함 · 뉴스레터 · 중복 기사 브리핑</div>
+    <h1 id="title">뉴스레터 브리핑</h1>
+    <div class="meta" id="meta"></div>
+    <p class="method" id="method"></p>
+  </header>
+  <div class="tldr"><h2>오늘 한 줄씩</h2><ol id="tldr"></ol></div>
+  <div id="sections" style="display:grid;gap:36px"></div>
+  <div class="work" id="work"></div>
+  <footer class="status" id="status"></footer>
+</div>
+
+<!-- 매일 바뀌는 내용은 이 블록만 고친다 -->
+<script type="application/json" id="briefing-data">
+{
+  "date": "2026.11.05",
+  "weekday": "목",
+  "period": "11/04 11:02 ~ 11/05 09:16",
+  "total": 10,
+  "excludedCount": 4,
+  "method": "같은 회사의 뉴스레터는 한 곳으로 셌습니다(뉴닉 데일리·솔티라이프 = 뉴닉). 뉴스 없는 술·문화 큐레이션(뉴술레터, 헤이팝), 에세이(한우물클럽), 제품 업데이트 안내(Glide)는 집계에서 뺐습니다. 원문은 자료/261105 뉴스레터 원문.txt",
+  "tldr": [
+    "메모리 호황의 양면 — 삼성·SK하이닉스 역대급 실적 뒤로 낸드값 하락 경고, PC 출하 21% 감소 (3곳)",
+    "청년 취업 문턱 여전 — 청년 고용률 29개월 연속 하락, 은행은 신입 대신 퇴직자 재고용 (3곳)",
+    "미국 중간선거 민주당 상·하원 탈환 — 태양광주 급등, 데이터센터 규제 주민투표 최소 33곳 (2곳)"
+  ],
+  "sections": [
+    {
+      "title": "오늘 수신분",
+      "sub": "11/04~11/05 · 10통 · 뉴스 꼭지가 있는 레터 5곳",
+      "base": 5,
+      "issues": [
+        {
+          "title": "메모리 반도체 호황의 양면",
+          "count": 3,
+          "sources": ["뉴닉", "어피티", "순살브리핑"],
+          "body": "뉴닉은 SK하이닉스 분기 매출 100조 원 돌파, 삼성전자 분기 영업이익 100조 원 돌파를 한 줄 소식으로 전했습니다. 어피티는 9월 글로벌 낸드 가격이 1년 만에 내리고 키옥시아가 실적 둔화를 예고해 메모리 하강 국면 경고가 나왔다고 짚으면서, HBM 확대로 일반 D램이 모자라 실적을 받칠 거라는 반론도 함께 실었습니다. 순살은 메모리값이 올라 3분기 세계 PC 출하가 21% 줄었고, 삼성 반도체가 영업이익 106조 원을 낼 때 스마트폰·네트워크 부문은 6천억 원 적자였다고 뒷면을 봤습니다."
+        },
+        {
+          "title": "청년 취업난과 신입 채용 감소",
+          "count": 3,
+          "sources": ["데일리뉴스럴", "뉴닉", "어피티"],
+          "body": "뉴스럴은 '쉬었음' 인구가 255만 1000명으로 4년 만에 줄었지만 청년 고용률은 29개월 연속 하락했고, 경력직 선호와 AI 확산으로 신입 채용이 여전히 어렵다고 전했습니다. 뉴닉은 20~30대 청년 자영업자가 1년 새 약 8만 명 늘었고 신규 자영업자 5명 중 1명이 '취업이 어려워서' 창업했다고 답했으며, 일도 구직도 하지 않는 청년이 68만 명이라고 했습니다. 어피티는 지난해 4대 은행이 다시 채용한 퇴직자가 1,013명으로 신입 채용(1,280명)의 약 80%이고, AI가 신입 행원 업무를 대체하고 있다고 짚었습니다."
+        }
+      ],
+      "pairs": [
+        { "title": "미국 중간선거 민주당 상·하원 탈환 — 어피티는 한화솔루션 등 태양광주 급등, 순살은 데이터센터 규제 주민투표 최소 33곳과 트럼프 연준 압박 제동에 주목", "sources": ["어피티", "순살브리핑"] },
+        { "title": "미국, SK하이닉스 중국 다롄 공장 장비 반입 승인 보류 — 솔리다임 뉴욕주 공장 계획도 불확실", "sources": ["뉴닉", "어피티"] },
+        { "title": "금융권 해킹 잇따라 — 뉴닉은 개인정보 대량 유출, 어피티는 금감원 IT 보안 전담조직 신설(금융사 20여 곳 피해)", "sources": ["뉴닉", "어피티"] },
+        { "title": "AMD 3분기 데이터센터 매출 97% 증가 — 리사 수 '내년 매출 80% 넘게 증가' 전망(어피티)", "sources": ["어피티", "순살브리핑"] },
+        { "title": "쿠팡 3분기 매출 14조 원대·영업손실 6423억 원 — 뉴스럴은 시간외 약 3% 하락, 순살은 매출 상회·씨티 상향에 12% 상승", "sources": ["데일리뉴스럴", "순살브리핑"] },
+        { "title": "슈퍼마켓 냉장 시스템 해킹 — 뉴닉은 유럽 11개국 피해, 뉴스럴은 국내 마트 '망 분리로 우려 낮아' 기사 제목", "sources": ["뉴닉", "데일리뉴스럴"] },
+        { "title": "캔바, 직원 22%(1,271명)에 해고·보직 변경 통보", "sources": ["순살브리핑", "데일리뉴스럴"] }
+      ]
+    }
+  ],
+  "work": [
+    { "title": "LIV 골프 청산 수순, JTBC 올 시즌 중계와 부산 다년 약정 차질", "source": "순살브리핑 11/05", "body": "사우디 국부펀드가 키운 LIV 골프가 9월 파산보호를 신청했고, 재건안도 무산돼 남은 자산을 나누는 쪽으로 가고 있습니다. 순살은 작년 매출에서 방송 비중이 5%뿐이었다며 '선수는 샀지만 시청자는 못 샀다'고 봤습니다. JTBC가 올 시즌 중계를 맡았고, 부산 다년 약정은 사실상 1년으로 끝날 판이라고 전했습니다. 중앙그룹 계열 방송사 관련 소식입니다." },
+    { "title": "디즈니 수천 명 감원 검토, OTT 광고형 요금제 확산", "source": "어피티 11/05 · 데일리뉴스럴 11/05", "body": "어피티는 디즈니가 인건비와 운영비를 줄이고 콘텐츠·테마파크에 투자를 모으려 수천 명 감원을 검토한다고 전했습니다. 뉴스럴에는 '광고 볼까, 요금 더 낼까… OTT 투 트랙 요금제' 기사 제목만 실렸습니다. 어제 브리핑의 디즈니+ 광고형 요금제 소식과 이어지는 흐름입니다." },
+    { "title": "넷플릭스 성장 지속 우려, 인스타그램 90분 가로 영상 시험", "source": "뉴닉 솔티라이프 11/04", "body": "트렌드라이트 연계 꼭지에서 넷플릭스 매출·이익은 늘고 있지만 지금처럼 성장할 수 있을지 시장이 걱정한다며, 화제작이 끝난 뒤에도 시청자를 붙잡는 방법으로 '디즈니랜드를 따라한다'는 내용을 소개했습니다(본문은 링크). 같은 레터에서 인스타그램이 최대 90분 가로형 영상 업로드 기능 '피처스'를 시험 도입한다고 전했습니다." }
+  ],
+  "status": []
+}
+</script>
+
+<script>
+(function () {
+  var d = JSON.parse(document.getElementById('briefing-data').textContent);
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function chips(list) { var w = el('span', 'srcs'); list.forEach(function (s) { w.appendChild(el('span', 'chip', s)); }); return w; }
+
+  var t = document.getElementById('title');
+  t.textContent = '뉴스레터 브리핑 ';
+  t.appendChild(el('span', 'date', d.date + ' (' + d.weekday + ')'));
+
+  var meta = document.getElementById('meta');
+  [['수신', d.total + '통'], ['집계 제외', d.excludedCount + '통'], ['기간', d.period]].forEach(function (m) {
+    var s = el('span'); s.appendChild(document.createTextNode(m[0] + ' ')); s.appendChild(el('b', null, m[1])); meta.appendChild(s);
+  });
+  document.getElementById('method').textContent = d.method;
+
+  var tl = document.getElementById('tldr');
+  d.tldr.forEach(function (x) { tl.appendChild(el('li', null, x)); });
+
+  var secs = document.getElementById('sections');
+  d.sections.forEach(function (s) {
+    var b = el('section', 'block');
+    var h = el('div', 'block-head'); h.appendChild(el('h2', null, s.title)); h.appendChild(el('span', 'sub', s.sub)); b.appendChild(h);
+    var list = el('div', 'issues');
+    s.issues.forEach(function (it, i) {
+      var c = el('article', 'issue');
+      c.appendChild(el('div', 'rank', String(i + 1)));
+      c.appendChild(el('h3', null, it.title));
+      var cv = el('div', 'cover');
+      var dots = el('span', 'dots'); dots.setAttribute('aria-hidden', 'true');
+      var max = Math.max(s.base || it.count, it.count);
+      for (var k = 0; k < max; k++) { var dot = el('i', k < it.count ? 'on' : ''); dots.appendChild(dot); }
+      cv.appendChild(dots); cv.appendChild(el('span', 'count', it.count + '곳'));
+      cv.appendChild(chips(it.sources));
+      c.appendChild(cv);
+      c.appendChild(el('p', null, it.body));
+      list.appendChild(c);
+    });
+    b.appendChild(list);
+    if (s.pairs && s.pairs.length) {
+      var p = el('div', 'pairs'); p.appendChild(el('h3', null, '2곳에서 겹친 이슈'));
+      var ul = el('ul');
+      s.pairs.forEach(function (x) { var li = el('li'); li.appendChild(el('span', 't', x.title)); li.appendChild(chips(x.sources)); ul.appendChild(li); });
+      p.appendChild(ul); b.appendChild(p);
+    }
+    secs.appendChild(b);
+  });
+
+  var w = document.getElementById('work');
+  if (d.work && d.work.length) {
+    var wh = el('div', 'block-head'); wh.appendChild(el('h2', null, '업무상 참고')); wh.appendChild(el('span', 'sub', '중복과 별개로 표시한 콘텐츠·OTT 관련 소식 (제안)')); w.appendChild(wh);
+    d.work.forEach(function (x) {
+      var it = el('div', 'work-item'); it.appendChild(el('h3', null, x.title)); it.appendChild(el('span', 'src', x.source)); it.appendChild(el('p', null, x.body)); w.appendChild(it);
+    });
+  } else { w.hidden = true; }
+
+  var st = document.getElementById('status');
+  if (d.status && d.status.length) {
+    st.appendChild(el('strong', null, '메일함 메모'));
+    var u = el('ul'); d.status.forEach(function (x) { u.appendChild(el('li', null, x)); }); st.appendChild(u);
+  } else { st.hidden = true; }
+})();
+</script>

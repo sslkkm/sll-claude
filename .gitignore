@@ -1,0 +1,17 @@
+# Office 임시·잠금 파일
+~$*
+*.tmp
+
+# Windows·Drive 시스템 파일
+desktop.ini
+Thumbs.db
+*.gsheet
+*.gdoc
+*.gslides
+
+# 개인 설정·비밀값
+.env
+.claude/settings.local.json
+
+# Python 캐시
+__pycache__/

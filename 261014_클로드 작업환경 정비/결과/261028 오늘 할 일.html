@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오늘 할 일 2026-10-28</title>
+<style>
+:root{--bg:#f7f7f5;--card:#fff;--ink:#1f2328;--muted:#6b7280;--line:#e5e7eb;--accent:#2563eb;--done:#9ca3af;--tag-d:#fde68a;--tag-a:#bfdbfe;--tag-c:#fecaca;--row-done:#f3f4f6}
+@media (prefers-color-scheme:dark){:root{--bg:#16181d;--card:#1f2228;--ink:#e6e6e6;--muted:#9aa1ab;--line:#30343c;--accent:#60a5fa;--done:#6b7280;--tag-d:#78591a;--tag-a:#1e3a8a;--tag-c:#7f1d1d;--row-done:#1a1c21}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Pretendard","Malgun Gothic",system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.bar button,.bar select{font:inherit;padding:6px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;cursor:pointer}
+.prog{margin-left:auto;color:var(--muted)}
+.wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;background:var(--card);position:sticky;top:0}
+td.c{width:44px;text-align:center}
+input[type=checkbox]{width:18px;height:18px;cursor:pointer}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;white-space:nowrap}
+.t-결정{background:var(--tag-d)}.t-행동{background:var(--tag-a)}.t-점검{background:var(--tag-c)}
+.folder{color:var(--muted);font-size:12px;white-space:nowrap}
+.due{white-space:nowrap;font-weight:600}
+tr.done td{background:var(--row-done)}
+tr.done .txt{text-decoration:line-through;color:var(--done)}
+.when{color:var(--muted);font-size:12px}
+#copied{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+<h1>오늘 할 일 — 2026-10-28(수)</h1>
+<p class="sub">/today 결과를 표로 옮겼다. 체크 상태는 이 브라우저에만 저장된다. 다 한 일은 「완료 목록 복사」로 Claude에게 붙여 넣으면 README에 반영한다.</p>
+<div class="bar">
+  <select id="f"><option value="">전체 구분</option><option>결정</option><option>행동</option><option>점검</option></select>
+  <label><input type="checkbox" id="hide"> 완료 숨기기</label>
+  <button id="copy">완료 목록 복사</button>
+  <button id="reset">체크 모두 해제</button>
+  <span id="copied"></span>
+  <span class="prog" id="prog"></span>
+</div>
+<div class="wrap"><table>
+<thead><tr><th>완료</th><th>구분</th><th>할 일</th><th>마감</th><th>업무 폴더</th></tr></thead>
+<tbody id="tb"></tbody>
+</table></div>
+</main>
+<script>
+const items=[
+["d1","결정","독점·조합 최종 자료 형태 정하기 (R2 템플릿 확장 / 별도 비교모델 / 설명 덱 장 추가)","","261016_프로젝트 손익 시뮬레이션"],
+["d2","결정","시뮬레이터 손상처리 구현 여부, 팀장님 코드 vs 직접 제작","","261016_프로젝트 손익 시뮬레이션"],
+["d3","결정","4월 이후 실제 진행 범위 확인","","261016_프로젝트 손익 시뮬레이션"],
+["d4","결정","뉴스레터 업무 참고 항목(콘텐츠·OTT·숏드라마) 유지 여부","","261026_뉴스레터 중복기사 정리"],
+["d5","결정","대회 목표 기록 정하기","","261027_10km 마라톤 러닝 루트"],
+["d6","결정","뉴콘텐트TF 포맷 목록 구성 (고민 중)","","261013_드라마본부 회의 시트 정리"],
+["d7","결정","카카오톡 받은 파일·(1912~2412) 원본 정리 여부 (추후)","","261013_D드라이브 중복정리"],
+["a1","행동","뉴스레터 예약 프롬프트를 스크립트 직접 호출로 바꾸거나 권한 규칙 추가","","261026_뉴스레터 중복기사 정리"],
+["a2","행동","Outlook 뉴스레터 규칙에 Teams 알림 예외 추가 (수동)","","261026_뉴스레터 중복기사 정리"],
+["a3","행동","첫 정기 집계 결과 보고 포함·제외 판단 확인","10/30(금)","261023_플랫폼별 진행현황 주간집계"],
+["a4","행동","조합 결과물(비교모델 xlsx·계산경로 md)과 R2_R6 검토","","261016_프로젝트 손익 시뮬레이션"],
+["a5","행동","「00_처음읽기」·설명 덱에 독점·조합 비교 장 추가 (형태 상의 후)","","261016_프로젝트 손익 시뮬레이션"],
+["a6","행동","설명 덱 검토 후 의견 주기","","261016_프로젝트 손익 시뮬레이션"],
+["a7","행동","해외 신작·판권상각 차이 마무리","","261016_프로젝트 손익 시뮬레이션"],
+["a8","행동","경영기획팀 문의 후보 판단 (raw 시트 출처, 대손상각비 사유)","","261016_프로젝트 손익 시뮬레이션"],
+["a9","행동","학습 문서 보완 후 팀장님께 전달","","261016_프로젝트 손익 시뮬레이션"],
+["a10","행동","채팅 산출물을 자료/로 옮기기 (나중에)","","261016_프로젝트 손익 시뮬레이션"],
+["a11","행동","실제로 뛰어 보고 거리·반환점 조정","","261027_10km 마라톤 러닝 루트"],
+["a12","행동","포맷 목록 확정 후 뉴콘텐트TF 탭 값 채우기","","261013_드라마본부 회의 시트 정리"],
+["a13","행동","Gemini API 키 폐기·재발급, 휴지통 키 캡처 영구 삭제","","261013_D드라이브 중복정리"],
+["a14","행동","/worklog 써 보고 SKILL.md 다듬기","","261014_클로드 작업환경 정비"],
+["c1","점검","작업환경 정비 업무 계속할지 완료할지 (마지막 확인 10/16)","","261014_클로드 작업환경 정비"],
+["c2","점검","최상위 .gsheet 파일(플랫폼별 프로젝트 영업 추진 현황 사본) 옮기거나 지우기","","최상위"],
+["c3","점검","빈 '새 폴더' 지우기","","최상위"],
+["c4","점검","손익 시뮬레이션 현재 상태의 지난 문장 정리","","261016_프로젝트 손익 시뮬레이션"],
+["c5","점검","뉴스레터 상태판 확인일·운영 메모 정리","","261026_뉴스레터 중복기사 정리"],
+["c6","점검","마라톤 루트(개인 일) 폴더 위치 확인","","261027_10km 마라톤 러닝 루트"]
+];
+const KEY="today-261028";
+let st={};
+try{st=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){st={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+const tb=document.getElementById("tb"),f=document.getElementById("f"),hide=document.getElementById("hide");
+function render(){
+  tb.innerHTML="";let n=0;
+  for(const [id,k,t,due,fd] of items){
+    const done=!!st[id]; if(done)n++;
+    if(f.value&&f.value!==k)continue;
+    if(hide.checked&&done)continue;
+    const tr=document.createElement("tr"); if(done)tr.className="done";
+    tr.innerHTML=`<td class="c"><input type="checkbox" ${done?"checked":""} aria-label="완료"></td><td><span class="tag t-${k}">${k}</span></td><td><span class="txt">${t}</span>${done?`<div class="when">완료 ${st[id]}</div>`:""}</td><td class="due">${due}</td><td class="folder">${fd}</td>`;
+    tr.querySelector("input").addEventListener("change",e=>{
+      if(e.target.checked){const d=new Date();st[id]=`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}else delete st[id];
+      save();render();
+    });
+    tb.appendChild(tr);
+  }
+  document.getElementById("prog").textContent=`완료 ${n} / ${items.length}`;
+}
+f.onchange=render;hide.onchange=render;
+document.getElementById("reset").onclick=()=>{if(confirm("체크를 모두 해제할까요?")){st={};save();render()}};
+document.getElementById("copy").onclick=async()=>{
+  const lines=items.filter(i=>st[i[0]]).map(i=>`- [완료 ${st[i[0]]}] ${i[2]} (${i[4]})`);
+  const txt=lines.length?"오늘 완료한 일:\n"+lines.join("\n"):"완료한 항목 없음";
+  try{await navigator.clipboard.writeText(txt);document.getElementById("copied").textContent="복사됨"}catch(e){prompt("아래 내용을 복사하세요",txt)}
+  setTimeout(()=>document.getElementById("copied").textContent="",2000);
+};
+render();
+</script>
+</body>
+</html>

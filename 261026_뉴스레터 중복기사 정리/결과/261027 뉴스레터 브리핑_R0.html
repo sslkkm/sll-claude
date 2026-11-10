@@ -1,0 +1,219 @@
+<title>뉴스레터 브리핑</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* 레이아웃: 한 줄 요약 → 섹션별 '겹친 곳 수' 순위 카드 → 2곳 목록 → 업무 참고 밴드 → 메일함 메모 */
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --ink: #142030;
+  --muted: #5b6878;
+  --line: #dde3ea;
+  --accent: #2450d6;
+  --accent-soft: #e7edfc;
+  --dot-off: #cfd6df;
+  --work: #0f7b6c;
+  --work-soft: #e3f3f0;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151d; --surface: #17202b; --ink: #e6ebf1; --muted: #9aa7b6; --line: #273342;
+    --accent: #7f9ef5; --accent-soft: #1d2a48; --dot-off: #33404f; --work: #4cc3ad; --work-soft: #12302b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151d; --surface: #17202b; --ink: #e6ebf1; --muted: #9aa7b6; --line: #273342;
+  --accent: #7f9ef5; --accent-soft: #1d2a48; --dot-off: #33404f; --work: #4cc3ad; --work-soft: #12302b;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+.wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 36px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+.mast { display: grid; gap: 10px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; color: var(--muted); font-weight: 500; }
+.mast h1 { font-size: clamp(26px, 5vw, 36px); font-weight: 700; letter-spacing: -.01em; }
+.mast h1 .date { font-family: var(--font-num); font-weight: 600; color: var(--accent); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.meta span { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 13px; color: var(--muted); }
+.meta b { color: var(--ink); font-family: var(--font-num); font-weight: 600; }
+.method { font-size: 13px; color: var(--muted); max-width: 68ch; }
+
+.tldr { background: var(--accent); color: #fff; border-radius: 14px; padding: 20px 22px; display: grid; gap: 10px; }
+.tldr h2 { font-size: 13px; letter-spacing: .08em; font-weight: 500; opacity: .85; }
+.tldr ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; font-size: 16px; font-weight: 500; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tldr { color: #0f151d; } }
+:root[data-theme="dark"] .tldr { color: #0f151d; }
+
+section.block { display: grid; gap: 14px; }
+.block-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+.block-head h2 { font-size: 20px; font-weight: 700; }
+.block-head .sub { font-size: 13px; color: var(--muted); }
+
+.issues { display: grid; gap: 12px; }
+.issue { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; }
+.rank { grid-row: span 3; font-family: var(--font-num); font-weight: 600; font-size: 28px; line-height: 1; color: var(--accent); min-width: 1.4em; }
+.issue h3 { font-size: 17px; font-weight: 700; min-width: 0; }
+.cover { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
+.dots { display: inline-flex; gap: 4px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--dot-off); display: block; }
+.dots i.on { background: var(--accent); }
+.count { font-family: var(--font-num); font-weight: 600; font-size: 13px; color: var(--accent); }
+.chip { font-size: 12px; padding: 1px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); white-space: nowrap; }
+.issue p { margin: 6px 0 0; color: var(--ink); min-width: 0; max-width: 68ch; }
+
+.pairs { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 20px; }
+.pairs h3 { font-size: 13px; letter-spacing: .06em; color: var(--muted); font-weight: 500; padding-top: 12px; }
+.pairs ul { list-style: none; margin: 0; padding: 0; }
+.pairs li { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.pairs li:first-child { border-top: 0; }
+.pairs li .t { flex: 1 1 320px; min-width: 0; }
+.pairs li .srcs { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.work { background: var(--work-soft); border-radius: 14px; padding: 18px 20px; display: grid; gap: 12px; }
+.work .block-head { border-color: var(--work); }
+.work .block-head h2 { color: var(--work); }
+.work-item { display: grid; gap: 2px; }
+.work-item h3 { font-size: 16px; font-weight: 700; }
+.work-item .src { font-size: 12px; color: var(--muted); }
+.work-item p { margin: 0; max-width: 68ch; }
+
+.status { font-size: 13px; color: var(--muted); display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 14px; }
+.status ul { margin: 0; padding-left: 1.2em; }
+@media (max-width: 480px) {
+  .issue { grid-template-columns: 1fr; }
+  .rank { grid-row: auto; font-size: 22px; }
+}
+</style>
+
+<div class="wrap" id="app">
+  <header class="mast">
+    <div class="eyebrow">받은 편지함 · 뉴스레터 · 중복 기사 브리핑</div>
+    <h1 id="title">뉴스레터 브리핑</h1>
+    <div class="meta" id="meta"></div>
+    <p class="method" id="method"></p>
+  </header>
+  <div class="tldr"><h2>오늘 한 줄씩</h2><ol id="tldr"></ol></div>
+  <div id="sections" style="display:grid;gap:36px"></div>
+  <div class="work" id="work"></div>
+  <footer class="status" id="status"></footer>
+</div>
+
+<!-- 매일 바뀌는 내용은 이 블록만 고친다 -->
+<script type="application/json" id="briefing-data">
+{
+  "date": "2026.10.27",
+  "weekday": "화",
+  "period": "10/26 09:04 ~ 10/27 10:12",
+  "total": 9,
+  "excludedCount": 3,
+  "method": "같은 회사의 뉴스레터는 한 곳으로 셌습니다. 뉴스 없이 강연·서비스 안내나 에세이·큐레이션 위주인 르코&렉스, 어거스트, 엘르보이스와 광고 꼭지는 집계에서 뺐습니다. 원문은 자료/261027 뉴스레터 원문.txt",
+  "tldr": [
+    "룰라, 브라질 첫 4선 대통령 — 다음 날 브라질 증시 13.9% 급락 (3곳)",
+    "다우키움, 문학동네 인수 우선협상대상자 선정 — 중앙일보 경영권 인수도 추진 중 (2곳)",
+    "앤트로픽, 미국 상장 신고서 제출 — 창업자 의결권 50.1% 고정 설계 (2곳)"
+  ],
+  "sections": [
+    {
+      "title": "오늘 수신분",
+      "sub": "10/26~27 · 9통 · 뉴스 꼭지가 있는 레터 6곳",
+      "base": 6,
+      "issues": [
+        {
+          "title": "룰라, 브라질 대선 결선 승리로 첫 4선 대통령",
+          "count": 3,
+          "sources": ["어피티", "뉴닉", "순살브리핑"],
+          "body": "25일 결선에서 룰라 대통령이 우파 후보 플라비우 보우소나루를 꺾고 브라질 역사상 첫 4선에 성공했습니다. 어피티와 뉴닉은 중남미 우파 집권 흐름(블루타이드)에 제동이 걸렸다고 봤고, 뉴닉은 상대도 절반 가까이 얻어 양극화가 이어질 거라고 덧붙였습니다. 순살은 시장 충격에 집중했습니다. 득표율 51.8%, 다음 날 보베스파 지수 13.9% 하락과 서킷브레이커, 브라질 ETF(EWZ) 19.8% 하락을 짚고, 국내 브라질 국채 투자자는 금리와 헤알화 손실이 겹칠 수 있다고 전했습니다."
+        }
+      ],
+      "pairs": [
+        { "title": "다우키움그룹, 문학동네 인수 우선협상대상자 선정 · 중앙일보 경영권 인수도 별도 추진", "sources": ["어피티", "데일리뉴스럴"] },
+        { "title": "앤트로픽 미국 상장 신고서(S-1) 제출, 티커 ANT · 창업자 의결권 50.1% 고정 (뉴스럴: 목표 기업가치 최대 2조달러)", "sources": ["순살브리핑", "데일리뉴스럴"] },
+        { "title": "반도체·AI 호황에도 청년·신입 일자리 감소 (뉴스럴: 15~29세 일자리 4년간 28만5000개 감소)", "sources": ["뉴닉", "데일리뉴스럴"] },
+        { "title": "브렌트유 장중 117달러 돌파 후 중동 확전 우려 줄며 115달러대로 하락", "sources": ["어피티", "순살브리핑"] },
+        { "title": "이스라엘 27일 총선, 2023년 하마스 기습 이후 처음", "sources": ["어피티", "순살브리핑"] }
+      ]
+    }
+  ],
+  "work": [
+    { "title": "다우키움, 문학동네 인수 추진하며 중앙일보 경영권 인수도 병행", "source": "어피티 10/27 · 데일리뉴스럴 10/27", "body": "다우키움그룹이 문학동네(지난해 매출 369억 원, 영업이익 71억 원) 인수 우선협상대상자로 선정됐습니다. 이미 키다리스튜디오·레진엔터테인먼트로 웹툰·웹소설을 하고 있어, 뉴스럴은 문학 IP의 영상화·해외 진출로 이어질 수 있다고 봤습니다. 두 레터 모두 최근 중앙일보 경영권 인수 우선협상대상자로도 선정된 점을 짚었습니다. 아직 최종 계약 전이며, 중앙그룹 계열사에 미칠 영향은 확인이 필요합니다." },
+    { "title": "AI 에이전트로 게임 개발 기간 단축 (블루홀 스튜디오 Seed팀)", "source": "디레터 10/27", "body": "크래프톤 산하 블루홀 스튜디오 Seed팀은 '75점짜리를 먼저 만들고 플레이로 검증'하는 방식으로 일합니다. 신규 무기 추가는 20일에서 하루로, 신규 몬스터 추가는 약 244시간에서 6시간으로 줄었다고 합니다. 문서·회의 같은 소통 병목을 줄인 사례라 콘텐츠 제작 공정에도 참고할 만합니다(제안)." },
+    { "title": "마이크로드라마 이용자 절반은 남성 · 스포티파이 AI 슬롭 5000만 건 제외", "source": "디레터 10/27", "body": "디레터 소식란에 제목만 실린 기사입니다. 마이크로드라마가 잠재 시청층을 놓쳤을 수 있다는 내용과, 스포티파이가 추천 목록에서 AI로 찍어낸 곡 5000만 건을 걸러냈다는 내용입니다. 본문은 원문 링크에서 확인해야 합니다." }
+  ],
+  "status": [
+    "09:10 첫 실행에서는 클래식 Outlook에 연결하지 못했고, 10:12 재실행에서 정상으로 읽었습니다. 수신량(9통)은 평소 범위입니다."
+  ]
+}
+</script>
+
+<script>
+(function () {
+  var d = JSON.parse(document.getElementById('briefing-data').textContent);
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function chips(list) { var w = el('span', 'srcs'); list.forEach(function (s) { w.appendChild(el('span', 'chip', s)); }); return w; }
+
+  var t = document.getElementById('title');
+  t.textContent = '뉴스레터 브리핑 ';
+  t.appendChild(el('span', 'date', d.date + ' (' + d.weekday + ')'));
+
+  var meta = document.getElementById('meta');
+  [['수신', d.total + '통'], ['집계 제외', d.excludedCount + '통'], ['기간', d.period]].forEach(function (m) {
+    var s = el('span'); s.appendChild(document.createTextNode(m[0] + ' ')); s.appendChild(el('b', null, m[1])); meta.appendChild(s);
+  });
+  document.getElementById('method').textContent = d.method;
+
+  var tl = document.getElementById('tldr');
+  d.tldr.forEach(function (x) { tl.appendChild(el('li', null, x)); });
+
+  var secs = document.getElementById('sections');
+  d.sections.forEach(function (s) {
+    var b = el('section', 'block');
+    var h = el('div', 'block-head'); h.appendChild(el('h2', null, s.title)); h.appendChild(el('span', 'sub', s.sub)); b.appendChild(h);
+    var list = el('div', 'issues');
+    s.issues.forEach(function (it, i) {
+      var c = el('article', 'issue');
+      c.appendChild(el('div', 'rank', String(i + 1)));
+      c.appendChild(el('h3', null, it.title));
+      var cv = el('div', 'cover');
+      var dots = el('span', 'dots'); dots.setAttribute('aria-hidden', 'true');
+      var max = Math.max(s.base || it.count, it.count);
+      for (var k = 0; k < max; k++) { var dot = el('i', k < it.count ? 'on' : ''); dots.appendChild(dot); }
+      cv.appendChild(dots); cv.appendChild(el('span', 'count', it.count + '곳'));
+      cv.appendChild(chips(it.sources));
+      c.appendChild(cv);
+      c.appendChild(el('p', null, it.body));
+      list.appendChild(c);
+    });
+    b.appendChild(list);
+    if (s.pairs && s.pairs.length) {
+      var p = el('div', 'pairs'); p.appendChild(el('h3', null, '2곳에서 겹친 이슈'));
+      var ul = el('ul');
+      s.pairs.forEach(function (x) { var li = el('li'); li.appendChild(el('span', 't', x.title)); li.appendChild(chips(x.sources)); ul.appendChild(li); });
+      p.appendChild(ul); b.appendChild(p);
+    }
+    secs.appendChild(b);
+  });
+
+  var w = document.getElementById('work');
+  if (d.work && d.work.length) {
+    var wh = el('div', 'block-head'); wh.appendChild(el('h2', null, '업무상 참고')); wh.appendChild(el('span', 'sub', '중복과 별개로 표시한 콘텐츠·OTT 관련 소식 (제안)')); w.appendChild(wh);
+    d.work.forEach(function (x) {
+      var it = el('div', 'work-item'); it.appendChild(el('h3', null, x.title)); it.appendChild(el('span', 'src', x.source)); it.appendChild(el('p', null, x.body)); w.appendChild(it);
+    });
+  } else { w.hidden = true; }
+
+  var st = document.getElementById('status');
+  if (d.status && d.status.length) {
+    st.appendChild(el('strong', null, '메일함 메모'));
+    var u = el('ul'); d.status.forEach(function (x) { u.appendChild(el('li', null, x)); }); st.appendChild(u);
+  } else { st.hidden = true; }
+})();
+</script>
